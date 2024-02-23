@@ -215,3 +215,87 @@ float outputSample = morphProcessor.render(guitarInputSample, sampleInputSample)
 - The `Morph` class leverages FFT to perform spectral analysis and synthesis, requiring careful management of phase information to ensure coherent output.
 - Spectral morphing is achieved by linear interpolation between the spectral magnitudes and frequencies of the two input signals, controlled by the `gAlpha` parameter.
 - This documentation provides a comprehensive overview of the `Morph` class's functionality, suitable for developers working on audio processing applications that involve spectral morphing techniques.
+
+### PitchTracker Class Documentation
+
+#### Overview
+The `PitchTracker` class is designed for pitch detection in audio signals. It utilizes a time-domain method known as the YIN algorithm for pitch tracking. This method is effective for monophonic signals and operates by analyzing the autocorrelation of the input signal. The class provides functionality to process audio samples, dynamically update the input buffer, and retrieve pitch information.
+
+#### Constructor
+```cpp
+PitchTracker(float sampleRate, unsigned int bufferSize);
+```
+- Initializes a `PitchTracker` object with the given sample rate and buffer size.
+- Parameters:
+  - `sampleRate`: The sample rate of the audio signal in Hz.
+  - `bufferSize`: The size of the input buffer to hold audio samples for processing.
+
+#### Public Methods
+```cpp
+float process();
+```
+- Processes the buffered audio samples to detect the pitch.
+- Returns: The detected pitch in Hz. A return value of -1 indicates that no pitch was detected.
+
+```cpp
+void setBufferValue(int index, float value);
+```
+- Updates a specific value in the input buffer.
+- Parameters:
+  - `index`: The index in the buffer to update.
+  - `value`: The new sample value to set at the specified index.
+
+```cpp
+void setBufferPointer(int value);
+```
+- Sets the current position in the input buffer where the next audio sample will be placed.
+- Parameters:
+  - `value`: The new buffer pointer position.
+
+```cpp
+int getBufferPointer() const;
+```
+- Retrieves the current position in the input buffer.
+- Returns: The current buffer pointer position.
+
+```cpp
+unsigned int getBufferSize() const;
+```
+- Retrieves the size of the input buffer.
+- Returns: The buffer size.
+
+#### Private Methods
+```cpp
+std::vector<float> downsample(const std::vector<float> &signal, int factor);
+```
+- Downsamples the given audio signal by the specified factor.
+- Parameters:
+  - `signal`: The audio signal to downsample.
+  - `factor`: The downsampling factor.
+- Returns: The downsampled signal.
+
+#### Private Members
+- `sampleRate`: The sample rate of the audio signal in Hz.
+- `bufferSize`: The size of the input buffer for audio samples.
+- `gInputBuffer`: The input buffer holding audio samples for pitch detection.
+- `gCachedInputBufferPointer`: The current position in the input buffer for the next audio sample.
+
+#### Algorithm Details
+- The pitch detection algorithm implemented in this class is based on the YIN algorithm, a popular method for fundamental frequency estimation.
+- The process involves creating a downsampled version of the input signal to reduce computational complexity, computing a difference function to identify periodicity, and then applying a cumulative mean normalized difference function to pinpoint the fundamental frequency.
+- Parabolic interpolation is used to refine the pitch estimate, enhancing the accuracy of the detected pitch.
+
+#### Usage Example
+```cpp
+PitchTracker pitchTracker(44100, 1024); // Initialize with sample rate and buffer size
+// Fill the buffer with audio samples
+for (int i = 0; i < 1024; i++) {
+    pitchTracker.setBufferValue(i, audioSamples[i]);
+}
+float pitch = pitchTracker.process(); // Detect the pitch
+```
+- This example demonstrates initializing a `PitchTracker` with a sample rate of 44100 Hz and a buffer size of 1024 samples, filling the buffer with audio data, and then calling the `process` method to detect the pitch of the buffered audio samples.
+
+### Notes
+- The `PitchTracker` class is designed for monophonic signals and may not accurately detect pitches in polyphonic content.
+- The accuracy of pitch detection can be influenced by the quality of the input signal, the chosen buffer size, and the sample rate. Adjusting the downsampling factor may help to balance accuracy and computational load.
