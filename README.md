@@ -48,6 +48,9 @@ void cleanup(BelaContext *context, void *userData);
 5. **Envelope Following:** Modulates output signal dynamically with input's amplitude envelope.
 6. **Compression:** Controls output signal's dynamic range before final output.
 
+#### System Diagram
+![System Diagram](DIAGRAM.png)
+
 #### Control Parameters
 - **Morph Amount:** Blend between live input and sampled audio.
 - **Guitar Gain:** Gain level of guitar input.
