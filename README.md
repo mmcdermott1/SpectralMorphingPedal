@@ -1,7 +1,7 @@
 # SpectralMorphingPedal
 
 ## Overview and Prerequisites
-The SpectralMorphingPedal is an embedded audio processing application designed for the Bela platform, focusing on real-time manipulation and transformation of audio signals. This application integrates various digital signal processing (DSP) components, such as a sampler, envelope follower, pitch tracker, spectral morpher, and compressor, to give the user the ability to spectrally morph the input signal with a set of samples. The samples have been omitted from this repository due to space constraints.
+The SpectralMorphingPedal is an embedded audio processing application designed for the Bela platform, focusing on real-time manipulation of audio signals to perform spectral morphing. This application integrates various digital signal processing components, such as a sampler, envelope follower, pitch tracker, spectral morpher, and compressor, to give the user the ability to spectrally morph the input signal with a set of samples. The samples have been omitted from this repository due to space constraints.
 
 **Prerequisites:**
 - **Knowledge of C++:** Understanding basic to intermediate C++ concepts is essential for navigating and modifying the application code.
@@ -18,28 +18,18 @@ The SpectralMorphingPedal is an embedded audio processing application designed f
 bool setup(BelaContext *context, void *userData);
 ```
 - Initializes the application, including loading audio samples, configuring DSP components, and setting up the graphical user interface (GUI).
-- **Parameters:**
-  - `context`: Provides context about the audio and DSP environment.
-  - `userData`: A pointer to user-defined data for initialization.
-- **Returns:** `true` if setup is successful, otherwise `false`.
 
 #### Render Function
 ```cpp
 void render(BelaContext *context, void *userData);
 ```
 - Acts as the core audio processing loop, invoked for each block of audio frames by the Bela system.
-- **Parameters:**
-  - `context`: Contains info on the current block of audio frames, including input/output buffers.
-  - `userData`: A pointer to user-defined data or state for processing.
 
 #### Cleanup Function
 ```cpp
 void cleanup(BelaContext *context, void *userData);
 ```
 - Releases resources when the application terminates.
-- **Parameters:**
-  - `context`: Context-specific information for cleanup.
-  - `userData`: User-defined data or state for cleanup.
 
 #### Key Components and Functionality
 - **Sampler:** Manages loading and playback of audio samples with pitch shifting.
@@ -51,8 +41,8 @@ void cleanup(BelaContext *context, void *userData);
 - **Auxiliary Tasks:** CPU-intensive tasks (pitch tracking, FFT) are offloaded to maintain real-time performance.
 
 #### DSP Flow
-1. **Input Processing:** Guitar input is filtered to remove low-frequency noise.
-2. **Pitch Tracking:** Real-time pitch tracking to inform pitch shifting of samples.
+1. **Input Processing:** Live input.
+2. **Pitch Tracking:** Real-time pitch tracking to set pitch of samples.
 3. **Sample Playback:** Pitch-shifted sample playback in sync with live input.
 4. **Spectral Morphing:** Live input and sample are morphed based on user settings.
 5. **Envelope Following:** Modulates output signal dynamically with input's amplitude envelope.
@@ -67,3 +57,11 @@ void cleanup(BelaContext *context, void *userData);
 
 #### Usage
 Designed for the Bela platform, this application leverages real-time DSP for live performance and experimentation. GUI sliders enable interactive control over audio processing parameters. This is a simple prototype and when fully implemented, would integrate physical hardware to control system parameters.
+
+#### Acknowledgements
+
+The Morph class was adapted from Andrew McPherson’s Phase Vocoder examples from his series Real-Time Audio Programming with Bela.
+
+The PitchTracker was adapted from Alain de Cheveigné and Hideki Kawahara's YIN algorithm.
+
+This project was completed for the Music and Audio Programming Course at Queen Mary University of London, instructed by Adan Benito Temprano.
