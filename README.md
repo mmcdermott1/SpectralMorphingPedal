@@ -1,6 +1,69 @@
 # SpectralMorphingPedal
- 
-### Compressor Class Documentation
+
+### render.cpp Documentation
+
+#### Overview
+`render.cpp` is the main entry point for an audio processing application running on the Bela platform. This file orchestrates the interaction between various audio processing components, including a sampler, an envelope follower, a pitch tracker, a spectral morpher, and a compressor. It handles real-time audio input, processes it through these components, and outputs the processed audio.
+
+#### Setup Function
+```cpp
+bool setup(BelaContext *context, void *userData);
+```
+- Initializes the application, including loading audio samples, setting up DSP components, and configuring the GUI.
+- Parameters:
+  - `context`: Provides information about the audio and digital signal processing environment.
+  - `userData`: A pointer to any user-defined data needed for initialization.
+- Returns `true` if setup is successful, `false` otherwise.
+
+#### Render Function
+```cpp
+void render(BelaContext *context, void *userData);
+```
+- The core audio processing loop called by the Bela system for each block of audio frames.
+- Parameters:
+  - `context`: Contains information about the current block of audio frames, including input and output buffers.
+  - `userData`: A pointer to user-defined data or state needed for processing.
+
+#### Cleanup Function
+```cpp
+void cleanup(BelaContext *context, void *userData);
+```
+- Cleans up resources upon termination of the application.
+- Parameters:
+  - `context`: Contains context-specific information for cleanup.
+  - `userData`: A pointer to user-defined data or state that may need to be cleaned up.
+
+#### Key Components and Functionality
+- **Sampler**: Handles loading and playback of audio samples, including pitch shifting.
+- **Envelope Follower**: Analyzes the amplitude envelope of the incoming audio signal.
+- **Pitch Tracker**: Estimates the pitch of the incoming audio signal in real-time.
+- **Morph**: Performs spectral morphing between the live input signal and the loaded sample.
+- **Compressor**: Applies dynamic range compression to the processed audio signal.
+- **GUI**: Provides real-time control over various parameters through a web interface.
+- **Auxiliary Tasks**: Offloads CPU-intensive tasks (e.g., pitch tracking, FFT processing) to auxiliary threads to maintain real-time audio performance.
+
+#### DSP Flow
+1. **Input Processing**: The guitar input is read and processed through a high-pass filter to remove low-frequency noise.
+2. **Pitch Tracking**: The pitch of the guitar input is tracked in real-time, and this information is used to control aspects of the audio processing, such as pitch shifting of the samples.
+3. **Sample Playback**: The selected audio sample is pitch-shifted and played back in sync with the live input.
+4. **Spectral Morphing**: The live input and the sampled audio are morphed together based on the control parameters set by the user.
+5. **Envelope Following**: The amplitude envelope of the live input is followed to modulate the output signal dynamically.
+6. **Compression**: The final output signal is dynamically compressed to control its dynamic range before being sent to the audio output.
+
+#### Control Parameters
+- **Morph Amount**: Controls the balance between the live input and the sampled audio in the spectral morph.
+- **Guitar Gain**: Adjusts the gain of the guitar input signal.
+- **Sampler Gain**: Adjusts the gain of the sampled audio signal.
+- **Pitch Offset**: Controls the pitch shifting of the sampled audio relative to the live input.
+- **Compression Settings**: Threshold, ratio, and makeup gain parameters for the compressor.
+
+#### Auxiliary Task Handling
+- **Pitch Tracking and FFT Processing**: Due to their computational intensity, these tasks are performed in auxiliary tasks to prevent audio dropouts.
+
+#### Usage
+This application is intended for use on the Bela platform, leveraging its real-time audio processing capabilities for live performance and experimentation with audio effects. The GUI sliders allow performers and creators to interactively control the audio processing parameters in real-time.
+
+### Compressor Class
 
 #### Overview
 The `Compressor` class is designed for dynamic range compression in real-time audio processing. It reduces the volume of loud sounds or amplifies quiet sounds by narrowing or compressing an audio signal's dynamic range. This class provides functionalities to set compression parameters and process individual audio samples through the compressor.
@@ -70,7 +133,7 @@ float processedSample = myCompressor.process(inputSample);
 
 This documentation provides a comprehensive overview of the `Compressor` class's functionality, suitable for developers integrating dynamic range compression into real-time audio processing applications.
 
-### EnvelopeFollower Class Documentation
+### EnvelopeFollower Class 
 
 #### Overview
 The `EnvelopeFollower` class implements an envelope following algorithm, which tracks the amplitude envelope of an audio signal. It is commonly used in audio processing for dynamics processing, such as compression, expansion, and gating. This class provides functionalities for setting the attack, release, and smoothing times, which control how quickly the envelope follower responds to changes in the signal's amplitude.
@@ -143,7 +206,7 @@ float envelopeValue = myEnvelopeFollower.process(inputSample);
 
 This documentation provides a comprehensive overview of the `EnvelopeFollower` class's functionality, suitable for developers working on audio processing applications that require amplitude envelope tracking.
 
-### Morph Class Documentation
+### Morph Class 
 
 #### Overview
 The `Morph` class implements a spectral morphing algorithm that combines aspects of two audio signals (e.g., guitar and sample inputs) into a single output signal. It utilizes Fast Fourier Transform (FFT) to analyze the spectral content of both inputs, morphs their spectra according to a specified ratio, and then synthesizes a new signal from the morphed spectrum. This process allows for creative audio effects, such as blending the timbral characteristics of two different sounds.
@@ -216,7 +279,7 @@ float outputSample = morphProcessor.render(guitarInputSample, sampleInputSample)
 - Spectral morphing is achieved by linear interpolation between the spectral magnitudes and frequencies of the two input signals, controlled by the `gAlpha` parameter.
 - This documentation provides a comprehensive overview of the `Morph` class's functionality, suitable for developers working on audio processing applications that involve spectral morphing techniques.
 
-### PitchTracker Class Documentation
+### PitchTracker Class 
 
 #### Overview
 The `PitchTracker` class is designed for pitch detection in audio signals. It utilizes a time-domain method known as the YIN algorithm for pitch tracking. This method is effective for monophonic signals and operates by analyzing the autocorrelation of the input signal. The class provides functionality to process audio samples, dynamically update the input buffer, and retrieve pitch information.
@@ -300,7 +363,7 @@ float pitch = pitchTracker.process(); // Detect the pitch
 - The `PitchTracker` class is designed for monophonic signals and may not accurately detect pitches in polyphonic content.
 - The accuracy of pitch detection can be influenced by the quality of the input signal, the chosen buffer size, and the sample rate. Adjusting the downsampling factor may help to balance accuracy and computational load.
 
-### Sampler Class Documentation
+### Sampler Class 
 
 #### Overview
 The `Sampler` class provides functionality to load and play back audio samples from a file with support for looping, pitch shifting, and cubic interpolation for smooth playback. It's designed to be used in audio processing applications where high-quality sample playback is required.
