@@ -142,3 +142,76 @@ float envelopeValue = myEnvelopeFollower.process(inputSample);
 - The implementation assumes that time constants are provided in milliseconds and converts them to appropriate gain factors for internal processing.
 
 This documentation provides a comprehensive overview of the `EnvelopeFollower` class's functionality, suitable for developers working on audio processing applications that require amplitude envelope tracking.
+
+### Morph Class Documentation
+
+#### Overview
+The `Morph` class implements a spectral morphing algorithm that combines aspects of two audio signals (e.g., guitar and sample inputs) into a single output signal. It utilizes Fast Fourier Transform (FFT) to analyze the spectral content of both inputs, morphs their spectra according to a specified ratio, and then synthesizes a new signal from the morphed spectrum. This process allows for creative audio effects, such as blending the timbral characteristics of two different sounds.
+
+#### Constructor
+```cpp
+Morph(int fftSize, int hopSize, int bufferSize);
+```
+- Initializes the `Morph` class with specified FFT size, hop size, and buffer size.
+- Parameters:
+  - `fftSize`: The size of the FFT window, determining the resolution of the spectral analysis.
+  - `hopSize`: The number of samples between successive FFT frames. Smaller values increase time resolution but decrease frequency resolution.
+  - `bufferSize`: The size of the circular buffers used for input and output, ensuring continuous processing of audio streams.
+
+#### Public Methods
+```cpp
+void setup();
+```
+- Prepares the `Morph` object for processing by setting up FFT objects, initializing buffers, and calculating analysis and synthesis windows.
+
+```cpp
+float wrapPhase(float phaseIn);
+```
+- Wraps a phase value to the range [-π, π].
+- Parameters:
+  - `phaseIn`: The phase value to wrap.
+- Returns: The wrapped phase value.
+
+```cpp
+void process_fft();
+```
+- Performs the FFT-based processing for both input signals, including phase unwrapping, spectral analysis, spectral morphing, and inverse FFT for synthesis.
+
+```cpp
+float render(float guitarInput, float sampleInput);
+```
+- Processes input samples from guitar and sample sources, applies spectral morphing, and returns the next output sample.
+- Parameters:
+  - `guitarInput`: The next input sample from the guitar.
+  - `sampleInput`: The next input sample from the sample source.
+- Returns: The next output sample resulting from the spectral morphing process.
+
+#### Public Members
+- `gHopCounter`: A counter for managing the hop size during processing.
+- `gHopSize`: The hop size between successive FFT frames.
+- `gInputBufferPointerGuitar`, `gInputBufferPointerSample`: Circular buffer pointers for managing the input samples for guitar and sample, respectively.
+- `gCachedInputBufferPointerGuitar`, `gCachedInputBufferPointerSample`: Used to manage the positions in the input buffers where samples are cached for processing.
+- `gAlpha`: The ratio of output to input frequency, controlling the balance of spectral characteristics between the two inputs during morphing.
+
+#### Private Members
+- `gFftGuitar`, `gFftSample`: FFT processing objects for guitar and sample inputs.
+- `gFftSize`: The size of the FFT window.
+- `gScaleFactor`: A factor for scaling the output, based on window type and overlap.
+- `gBufferSize`: The size of the circular buffers.
+- `gInputBufferGuitar`, `gInputBufferSample`: Circular buffers for collecting input samples from guitar and sample sources.
+- `gOutputBuffer`: Circular buffer for collecting the output of the overlap-add process.
+- `gOutputBufferWritePointer`, `gOutputBufferReadPointer`: Pointers for managing positions in the output buffer for writing and reading.
+- `gAnalysisWindowBuffer`, `gSynthesisWindowBuffer`: Buffers holding the windows for FFT analysis and synthesis.
+
+#### Usage Example
+```cpp
+Morph morphProcessor(1024, 256, 4096);
+morphProcessor.setup();
+float outputSample = morphProcessor.render(guitarInputSample, sampleInputSample);
+```
+- This example sets up a `Morph` instance with a specific FFT size, hop size, and buffer size, prepares it for processing, and then processes individual samples from guitar and sample inputs to produce a morphed output sample.
+
+### Notes
+- The `Morph` class leverages FFT to perform spectral analysis and synthesis, requiring careful management of phase information to ensure coherent output.
+- Spectral morphing is achieved by linear interpolation between the spectral magnitudes and frequencies of the two input signals, controlled by the `gAlpha` parameter.
+- This documentation provides a comprehensive overview of the `Morph` class's functionality, suitable for developers working on audio processing applications that involve spectral morphing techniques.
