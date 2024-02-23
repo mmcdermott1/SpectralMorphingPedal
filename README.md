@@ -299,3 +299,65 @@ float pitch = pitchTracker.process(); // Detect the pitch
 ### Notes
 - The `PitchTracker` class is designed for monophonic signals and may not accurately detect pitches in polyphonic content.
 - The accuracy of pitch detection can be influenced by the quality of the input signal, the chosen buffer size, and the sample rate. Adjusting the downsampling factor may help to balance accuracy and computational load.
+
+### Sampler Class Documentation
+
+#### Overview
+The `Sampler` class provides functionality to load and play back audio samples from a file with support for looping, pitch shifting, and cubic interpolation for smooth playback. It's designed to be used in audio processing applications where high-quality sample playback is required.
+
+#### Constructor
+```cpp
+Sampler(const std::string &filename, bool loop, bool autostart);
+```
+- Initializes a new `Sampler` instance, loading an audio file and setting playback options.
+- Parameters:
+  - `filename`: Path to the audio file to be loaded.
+  - `loop`: Indicates whether the sample should loop when it reaches the end.
+  - `autostart`: Determines whether playback should start immediately upon loading the sample.
+
+#### Public Methods
+```cpp
+bool setup(const std::string &filename, bool loop, bool autostart);
+```
+- Loads an audio file and sets playback options. This method can be used to reconfigure the `Sampler` after it has been constructed.
+- Parameters are the same as the constructor.
+- Returns `true` if the file is loaded successfully, `false` otherwise.
+
+```cpp
+void trigger();
+```
+- Starts or restarts sample playback from the beginning.
+
+```cpp
+float process(float frequency, float baseFrequency);
+```
+- Processes and returns the next sample from the audio file, applying pitch shifting based on the specified frequency and the base frequency of the sample.
+- Parameters:
+  - `frequency`: The target frequency for playback.
+  - `baseFrequency`: The original (base) frequency of the sample. Pitch shifting is relative to this frequency.
+- Returns: The next audio sample, pitch-shifted as requested.
+
+#### Private Methods
+```cpp
+float cubicInterpolation(float x, float y0, float y1, float y2, float y3);
+```
+- Performs cubic interpolation between four sample points to calculate a smoothly interpolated value.
+- Parameters:
+  - `x`: The fractional index between `y1` and `y2` for which the interpolated value is desired.
+  - `y0`, `y1`, `y2`, `y3`: The sample values immediately before, at, and after the desired index, respectively.
+- Returns: The interpolated sample value.
+
+#### Usage Example
+```cpp
+Sampler mySampler("path/to/sample.wav", true, false);
+mySampler.trigger(); // Start playback
+float frequency = 440; // Target frequency for pitch shifting
+float baseFrequency = 440; // Original frequency of the sample
+float nextSample = mySampler.process(frequency, baseFrequency); // Retrieve the next pitch-shifted sample
+```
+- This example demonstrates initializing a `Sampler` with a specified audio file, enabling looping, and disabling autostart. Playback is started manually with `trigger()`. The `process` method is then called to retrieve pitch-shifted samples, where the pitch shifting is based on the desired frequency.
+
+### Notes
+- The class supports only mono audio files for simplicity and efficiency in real-time audio processing contexts.
+- Cubic interpolation is used to provide smooth pitch shifting and playback, significantly improving the quality over simpler linear interpolation methods, especially noticeable when the pitch shift factor is far from 1.
+- The sampler is designed to handle looping and non-looping playback modes, making it suitable for a wide range of musical applications, from one-shot sound effects to continuous background music loops.
