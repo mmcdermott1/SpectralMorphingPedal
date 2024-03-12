@@ -1,5 +1,7 @@
 # SpectralMorphingPedal
 
+#### Video Demo: https://www.youtube.com/watch?v=IqTfSJJCxtA&list=PL4widt4EFIHcix-wPnhlElrksZj2lt3cM&index=5
+
 ## Overview and Prerequisites
 The SpectralMorphingPedal is an embedded audio processing application designed for the Bela platform, focusing on real-time manipulation of audio signals to perform spectral morphing. This application integrates various digital signal processing components, such as a sampler, envelope follower, pitch tracker, spectral morpher, and compressor, to give the user the ability to spectrally morph the input signal with a set of samples. The samples have been omitted from this repository due to space constraints.
 
